@@ -1,10 +1,11 @@
 import { type ConfigEnv, defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 const viteConfig = defineConfig((env: ConfigEnv) => {
   const idDevMode = env.mode.includes('development');
-
+  
   return {
     plugins: [
       react({
@@ -24,9 +25,7 @@ const viteConfig = defineConfig((env: ConfigEnv) => {
       devSourcemap: true,
       modules: {
         localsConvention: 'camelCase',
-        generateScopedName: idDevMode
-          ? '_[local]_-_[hash:base64:3]'
-          : '_[hash:base64:6]_',
+        generateScopedName: idDevMode ? '_[local]_-_[hash:base64:3]' : '_[hash:base64:6]_'
       },
     },
     resolve: {
