@@ -4,12 +4,13 @@ import react from '@vitejs/plugin-react';
 
 const viteConfig = defineConfig((env: ConfigEnv) => {
   const idDevMode = env.mode.includes('development');
-  
+
   return {
     plugins: [
       react({
         jsxRuntime: 'automatic',
       }),
+      tailwindcss(),
     ],
     server: {
       host: 'localhost',
@@ -23,7 +24,9 @@ const viteConfig = defineConfig((env: ConfigEnv) => {
       devSourcemap: true,
       modules: {
         localsConvention: 'camelCase',
-        generateScopedName: idDevMode ? '_[local]_-_[hash:base64:3]' : '_[hash:base64:6]_'
+        generateScopedName: idDevMode
+          ? '_[local]_-_[hash:base64:3]'
+          : '_[hash:base64:6]_',
       },
     },
     resolve: {
