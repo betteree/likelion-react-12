@@ -1,14 +1,28 @@
-import { useState } from 'react';
 import { tm } from '@/utils/tw-merge';
+
+export interface AccordionItemType {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+  open?: boolean;
+}
 
 interface AccordionItemProps {
   title: string;
   children: React.ReactNode;
+  open?: boolean;
+  onUpdate?: () => void;
 }
 
-function AccordionItem({ title, children }: AccordionItemProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const handleToggle = () => setIsVisible((v) => !v);
+function AccordionItem({
+  title,
+  children,
+  open = false,
+  onUpdate,
+}: AccordionItemProps) {
+  const handleToggle = () => {
+    onUpdate?.();
+  };
 
   return (
     <div className={tm('flex flex-col space-y-2 w-full', 'mt-2 mb-4')}>
@@ -25,7 +39,7 @@ function AccordionItem({ title, children }: AccordionItemProps) {
       </button>
       <div
         className={tm(
-          { hidden: !isVisible },
+          { hidden: !open },
           'text-sm text-slate-800 leading-[1.5]',
           '*:mb-2',
           // [from]
@@ -33,9 +47,9 @@ function AccordionItem({ title, children }: AccordionItemProps) {
           // @staring-style
           'starting:opacity-0 starting:-translate-y-2 starting:h-0',
           // 전환(transition)
-          'transition-all transition-discrete duration-700 delay-100',
+          'transition-all transition-discrete duration-400 ease-in-out',
           // [to]
-          { 'opacity-100 translate-y-0 h-30': isVisible }
+          { 'opacity-100 translate-y-0 h-30': open }
         )}
       >
         {children}
