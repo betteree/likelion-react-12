@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 // 클래스 컴포넌트 라이프사이클 메서드
 import { tm } from '@/utils/tw-merge';
-import { Component } from 'react';
+import { Component, ErrorInfo } from 'react';
 
 // 속성(props)
 interface Props {
@@ -16,6 +16,9 @@ type RequiredProps = Required<Props>;
 // 상태(state)
 interface State {
   count: number;
+  doubleCount?: number;
+  error: null | Error;
+  errorInfo: null | ErrorInfo;
 }
 
 class Counter extends Component<Props, State> {
@@ -45,10 +48,50 @@ class Counter extends Component<Props, State> {
     // this.handleIncrease = this.handleIncrease.bind(this);
   }
 
+  // [라이프사이클 메서드] ---------------------------------------------
+  // 외부 데이터(props)로부터 파생된 상태(derived state) 설정 시점
+  static getDerivedStateFromProps(
+    _props: Readonly<RequiredProps>,
+    state: Readonly<State>
+  ) {
+    // console.log(
+    //   '외부 데이터(props)로부터 파생된 상태(derived state) 설정 시점'
+    // );
+    // console.log(props);
+
+    // 파생된 상태 (derived state)
+    return {
+      // doubleCount: props.count * 2,
+      doubleCount: state.count * 2,
+    };
+  }
+
   // <클래스 필드>
-  state = {
+  state: State = {
     count: this.props.count ?? Counter.defaultProps.count,
+    error: null,
+    errorInfo: null,
   };
+
+  // [라이프사이클 메서드] ---------------------------------------------
+  // 컴포넌트 렌더링 진행 유무 결정 시점
+  // <주의!!!> 오직 성능 최적화 만을 위해 사용!!
+  shouldComponentUpdate(
+    nextProps: Readonly<RequiredProps>,
+    nextState: Readonly<State>
+  ): boolean {
+    if (nextProps.max < nextState.count) {
+      console.log('렌더링 차단');
+      return false;
+    }
+
+    return true;
+
+    // 렌더링 해라
+    // return true;
+    // 렌더링 하지마라
+    // return false;
+  }
 
   // [라이프사이클 메서드] ---------------------------------------------
   // 렌더(render) 시점
@@ -61,7 +104,7 @@ class Counter extends Component<Props, State> {
       <div className={tm('flex flex-col gap-2 items-start')}>
         <h2 className="sr-only">카운터</h2>
         <output className={tm('font-semibold text-3xl text-react')}>
-          {this.state.count}
+          {this.state.count} {this.state.doubleCount}
         </output>
         <div className={tm('flex', '*:hover:bg-sky-800 *:cursor-pointer')}>
           <button
@@ -81,6 +124,18 @@ class Counter extends Component<Props, State> {
         </div>
       </div>
     );
+  }
+
+  // [라이프사이클 메서드] ---------------------------------------------
+  getSnapshotBeforeUpdate() {
+    // 이전 속성 또는 상태와 현재 렌더링 시점의 속성 또는 상태 비교
+    // prevProps: Readonly<Props>,
+    // prevState: Readonly<State>
+    //
+    // ui가 부자연 스러우면... 스냅샷 데이터 반환
+    // snapshot 데이터
+    // return snapshot;
+    return null;
   }
 
   // <클래스 필드>
@@ -107,6 +162,7 @@ class Counter extends Component<Props, State> {
   componentDidUpdate(
     _prevProps: Readonly<Props>,
     prevState: Readonly<State>
+    // _snapshot: unknown
   ): void {
     console.group('이전 상태 값');
     // console.log({ prevProps });
@@ -116,6 +172,9 @@ class Counter extends Component<Props, State> {
     console.group('현재 상태 값');
     console.log(this.state.count);
     console.groupEnd();
+
+    // 부자연스러운 UI 움직임을 정상적으로 보이도록 처리 (사이드 이펙트)
+    // 스냅샷 정보 활용
 
     // 사이드 이펙트
     // 리액트 렌더링 프로세스와 상관없는 일 처리
@@ -131,11 +190,29 @@ class Counter extends Component<Props, State> {
     console.log('Counter 언마운트 될 예정');
     // 타이머 이벤트 구독 해지
     console.log('타이머 이벤트 구독 해지');
-    // clearInterval(this.clearIntervalId);
+    clearInterval(this.clearIntervalId);
+  }
+
+  // [라이프사이클 메서드] ---------------------------------------------
+  // 정적(클래스) 멤버
+  static getDerivedStateFromError(error: Error) {
+    return {
+      error,
+    };
+  }
+
+  // 인스턴스 멤버
+  // 오류 감지(error catch)
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    this.setState({
+      error,
+      errorInfo, // { componentStack, digest }
+    });
   }
 
   // <클래스 필드>
   // 이벤트 핸들러 ---------------------------------------------------
+  // [이벤트 핸들러]
   handleDecrease = () => {
     const { step } = this.props;
 
