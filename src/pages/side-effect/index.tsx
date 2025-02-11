@@ -1,57 +1,75 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { tm } from '@/utils/tw-merge';
+import throttle from '@/utils/throttle';
+import debounce from '@/utils/debounce';
 
-// const icon = '⭐️';
-
-// 순수성, 불변성, 투명성
 function SideEffectDemo() {
-  const [message, setMessage] = useState('안녕!');
+  const throttleTimeId = useId();
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
-  // 순수성 해침
-  // 사이드 이펙트
-  // message += icon;
-  // icon += '✅';
+  // [상태]
+  const [throttleTime, setThrottleTime] = useState(500);
 
-  // 실제 DOM 노드 접근 시도
-  // 사이드 이펙트 처리 (여기 위치하면 안됨!)
-  // const buttonElement = document.querySelector('button[lang="en"]');
-  // console.log(buttonElement); // null
+  // [이벤트 핸들러: 상태 업데이트 로직 포함]
+  // JSX에 연결되는 이벤트 핸들러의 경우, 쓰로틀 또는
+  // 디바운스를 사용해 이벤트 발생 빈도를 조절해야 한다면
+  // value가 아닌, defaultValue 속성을 사용해야 한다.
+  const handleChangeThrottleTime = debounce(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const nextThrottleTime = Number(e.target.value);
+      setThrottleTime(nextThrottleTime);
+    },
+    300
+  );
 
-  // 위와 같이 순수성, 투명성을 깨는 코드는 함수 컴포넌트 몸체에 작성되면 안됨
-  // 그러므로 React.useEffect() 훅 함수를 사용해 사이드 이펙트 관리
+  // [이펙트]
   useEffect(() => {
-    // console.log('이펙트 콜백 함수는 useEffect() 훅 함수의 첫번째 인수로 전달된다.');
-    // console.log('이펙트 콜백 함수 내부에서는 사이드 이펙트 코드 작성이 허용된다.');
+    const handleMove = throttle((e: PointerEvent) => {
+      const x = Number(e.clientX.toFixed(0));
+      const y = Number(e.clientY.toFixed(0));
+      setMouse({ x, y });
+    }, throttleTime);
 
-    // 최초 렌더링 시 마운트 이후 실행되는 콜백 함수
-    console.log('Class::componentDidMount');
-    const buttonElement = document.querySelector('button[lang="en"]');
-    console.log(buttonElement); // <button>
-  }, []);
+    globalThis.addEventListener('pointermove', handleMove);
+
+    return () => {
+      globalThis.removeEventListener('pointermove', handleMove);
+    };
+  }, [throttleTime]);
 
   return (
-    <div>
-      <h2 className="sr-only">SideEffectDemo</h2>
+    <section className="flex flex-col items-start">
+      <h2 className="text-2xl font-medium">마우스 포인터 움직임 조절</h2>
 
-      <p className="text-5xl mt-5">{message}</p>
+      <div className="mt-5 mb-1">
+        <label htmlFor={throttleTimeId}>이벤트 발생 빈도 조절</label>
+        <div className={tm('flex gap-1')}>
+          <input
+            type="range"
+            className="accent-black"
+            id={throttleTimeId}
+            min={10}
+            max={1000}
+            // value={throttleTime}
+            defaultValue={throttleTime}
+            onChange={handleChangeThrottleTime}
+          />
+          <output>{throttleTime / 1000}s</output>
+        </div>
+      </div>
 
-      <button
-        type="button"
-        lang="en"
-        className='p-2 border mt-5'
-        // [이벤트 핸들러]
-        // 사용자에 의한 액션에 의해 처리
-        // 사이드 이펙트 처리
-        onClick={() => {
-          console.log(0, message);
-          // [상태 업데이트 함수] 실행은 컴포넌트 외부에서 진행
-          // 사이드 이펙트 처리
-          setMessage((message) => message + '🍏');
-          console.log(1, message);
-        }}
+      <output
+        className={tm(
+          'inline-flex justify-center',
+          'my-5 py-3 px-7 rounded-full',
+          'bg-black text-white text-2xl'
+        )}
       >
-        add apple icon
-      </button>
-    </div>
+        x <span className="font-thin mx-3">=</span> {mouse.x}{' '}
+        <span className="font-thin mx-3">/</span> y{' '}
+        <span className="font-thin mx-3">=</span> {mouse.y}
+      </output>
+    </section>
   );
 }
 
