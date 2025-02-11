@@ -1,5 +1,6 @@
-import { tm } from '@/utils/tw-merge';
 import { useId } from 'react';
+import { tm } from '@/utils/tw-merge';
+import { deleteQueryParam, setQueryParam } from '../utils/query-param';
 
 interface SearchFormProps {
   query: string;
@@ -8,13 +9,22 @@ interface SearchFormProps {
 
 function SearchForm({ query, setQuery }: SearchFormProps) {
   const searchInputId = useId();
+  const nextQuery = query.trim();
 
   const handleQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.currentTarget.value);
   };
 
+  const handleSearch = () => {
+    if (nextQuery.length > 0) {
+      setQueryParam(nextQuery);
+    } else {
+      deleteQueryParam();
+    }
+  };
+
   return (
-    <form className={tm('mb-10')}>
+    <form className={tm('mb-10')} action={handleSearch}>
       <label htmlFor={searchInputId} className="sr-only">
         카드 검색
       </label>
