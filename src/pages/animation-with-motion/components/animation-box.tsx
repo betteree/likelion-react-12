@@ -1,11 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { type Ref, useEffect, useRef } from 'react';
 import { tm } from '@/utils/tw-merge';
 import { animate } from 'motion';
 
+type AnimationBoxProps = Omit<React.ComponentProps<'div'>, 'ref'> & {
+  ref: Ref<HTMLButtonElement>;
+};
+
 function AnimationBox({
   className,
+  children,
+  ref,
   ...restProps
-}: React.ComponentProps<'div'>) {
+}: AnimationBoxProps) {
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,7 +50,15 @@ function AnimationBox({
         className
       )}
       {...restProps}
-    />
+    >
+      <button
+        ref={ref}
+        type="button"
+        className="cursor-pointer bg-slate-600/60 p-2 rounded-xl"
+      >
+        {children}
+      </button>
+    </div>
   );
 }
 
