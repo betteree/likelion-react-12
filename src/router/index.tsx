@@ -2,6 +2,7 @@ import MemoryComponentDataPage from '@/pages/memory-component-data';
 import AnimationWithMotionPage from '@/pages/animation-with-motion';
 import StateManagement from '@/pages/state-management';
 import ErrorBoundaryDemo from '@/pages/error-boundary';
+import DataFetchingPage from '@/pages/data-fetching';
 import SideEffectDemo from '@/pages/side-effect';
 import SearchListPage from '@/pages/search-list';
 import AccessDOMPage from '@/pages/access-dom';
@@ -16,14 +17,19 @@ import NotFound from '@/pages/not-found';
 
 export const navList = [
   {
-    path: 'accessing-dom',
-    text: 'DOM 접근/조작',
-    element: <AccessDOMPage />,
+    path: 'data-fetching',
+    text: '데이터 쿼리/뮤테이션',
+    element: <DataFetchingPage />,
   },
   {
     path: 'animation',
-    text: '애니메이션',
+    text: '모션 애니메이션',
     element: <AnimationWithMotionPage />,
+  },
+  {
+    path: 'accessing-dom',
+    text: 'DOM 접근/조작',
+    element: <AccessDOMPage />,
   },
   {
     path: 'memory-component-data',
