@@ -1,22 +1,27 @@
-import { tm } from '@/utils/tw-merge';
+import { use } from 'react';
+import { fetchPokemon } from '../api/pokemon';
+import PokemonLayout from './pokemon-layout';
 
-function Pokemon() {
+interface PokemonProps {
+  id: number;
+}
+
+function Pokemon({ id }: PokemonProps) {
+  const pokemon = use(fetchPokemon(id));
+
   return (
-    <figure
-      className={tm(
-        'flex gap-5 justify-center items-center',
-        'border-4 border-black/10 rounded-full',
-        'h-42 transition-colors duration-250 ease-in-out ',
-        'hover:border-black'
-      )}
-    >
+    <PokemonLayout>
       <img
-        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-        alt="pikachu"
-        title="pikachu"
+        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
+        alt=""
+        title=""
+        loading="lazy"
         className="size-28"
       />
-    </figure>
+      <figcaption className="text-sm text-stone-700 uppercase -translate-y-1">
+        {pokemon.name}
+      </figcaption>
+    </PokemonLayout>
   );
 }
 

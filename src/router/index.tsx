@@ -1,7 +1,9 @@
 import MemoryComponentDataPage from '@/pages/memory-component-data/page';
 import AnimationWithMotionPage from '@/pages/animation-with-motion/page';
+import TicTacToeWithContext from '@/pages/tic-tac-toe-with-context/page';
 import StateManagement from '@/pages/state-management/page';
 import ErrorBoundaryDemo from '@/pages/error-boundary/page';
+import UsingContextPage from '@/pages/using-context/page';
 import DataFetchingPage from '@/pages/data-fetching/page';
 import SuspenseUsePage from '@/pages/suspense-use/page';
 import CustomHookPage from '@/pages/custom-hook/page';
@@ -19,6 +21,16 @@ import NotFound from '@/pages/not-found/page';
 // 내비게이션 리스트 데이터
 
 export const navList = [
+  {
+    path: 't3-with-context',
+    text: '틱택토 게임 (with 컨텍스트)',
+    element: <TicTacToeWithContext />,
+  },
+  {
+    path: 'context-api',
+    text: '컨텍스트',
+    element: <UsingContextPage />,
+  },
   {
     path: 'streaming',
     text: '스트리밍',
