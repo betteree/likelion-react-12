@@ -1,14 +1,23 @@
 import Title from '@/components/title';
+import { useFetchData } from '@/hooks/use-fetch-data';
+import useToggle from '@/hooks/use-toggle';
 import Loading from '../memo-list/components/loading';
-import Pokemon from './components/pokemon';
+import PokemonWithUseFetchData from './components/pokemon-with-use-fetch-data';
+import PokemonWithUseQuery from './components/pokemon-with-use-query';
+import type { PokemonList } from './types';
 
 function CustomHookPage() {
   // 포켓몬 집합 정보 가져오기
   // 'https://pokeapi.co/api/v2/pokemon?offset=3&limit=10'
 
-  const loading = true;
-  const error = null;
-  const data = null;
+  const { loading, error, data } = useFetchData<PokemonList>(
+    'https://pokeapi.co/api/v2/pokemon?offset=3&limit=28'
+  );
+
+  const [toggleState, toggle] = useToggle(true, {
+    // persist: true,
+    key: '@toggle/',
+  });
 
   return (
     <>
@@ -18,21 +27,27 @@ function CustomHookPage() {
           사용자 정의 훅 함수(Custom Hook) 활용
         </h2>
 
+        <button type="button" onClick={toggle}>
+          {toggleState?.toString()}
+        </button>
+
         <h3 className="text-xl font-medium">
           페이지에서 데이터 요청/응답 후, 화면 업데이트
         </h3>
         {loading && (
           <Loading size={48} label="포켓몬 리스트 데이터 로딩 중..." />
         )}
-        {error && <div role="alert">{(error as Error).message}</div>}
-        {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+        {error && <div role="alert">{error.message}</div>}
+        {/* {data && <pre>{JSON.stringify(data, null, 2)}</pre>} */}
+        {!loading && data && <output>{data.results.length}</output>}
 
         <hr className="my-10" />
 
         <h3 className="text-xl font-medium mb-6">
           컴포넌트에서 데이터 요청/응답 후, 화면 업데이트
         </h3>
-        <Pokemon />
+        <PokemonWithUseFetchData />
+        <PokemonWithUseQuery />
       </section>
     </>
   );
